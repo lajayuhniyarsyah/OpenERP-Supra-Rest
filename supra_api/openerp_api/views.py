@@ -24,8 +24,8 @@ def GetModel(request,model,mode=None,fields=[]):
 	# param = [3401] #list id model
 
 
-	# login_d = 'admin'
-	# usrpwd_d = 'supra'
+	# login_d = 'ricky'
+	# usrpwd_d = 'ricky'
 
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
@@ -34,22 +34,34 @@ def GetModel(request,model,mode=None,fields=[]):
 
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
 	model_erp = connection.get_model(model)
-
+	
+	
 	if mode==None:
 		ids = model_erp.search([],0,100)
 		# ids = model_erp.search([('id','>',1235678)])
 	elif mode=="ids":
-		ids =request.data["ids"]
+		# print request.data["ids"],"<<<<<<<<<<<<<<<<<<<<<<"
+		ids =map(int, request.data["ids"])
 		# ids = [3401]
+	elif mode=='jsonrpc':
+		jsonrpc = openerplib.json_rpc('http://10.36.15.51:8069/sales_activity_plan','index',[])
+		return Response ({"sukses":True,"data":jsonrpc})
 	elif mode=="search":
-		ids = [3401]
+		searchfield = request.data['searchfield']
+		searchoperator = request.data['searchoperator']
+		searchcateg = request.data['searchcateg']
+		if searchcateg.isdigit():
+			searchcateg = int(request.data['searchcateg'])
+
+		print searchfield,searchoperator,searchcateg
+		ids = model_erp.search([(searchfield,searchoperator,searchcateg)])
 		# ids = request.data['nama']
-		print "ini yang search bro"
+		# print "ini yang search bro"
 	elif mode == "getupdate":
 		last_id=  request.data['ids']
-		print last_id,"bebas"
-		ids = model_erp.search([('id','>',2000)],0,100)
-		print ids ,"cek"
+		# print last_id,"bebas"
+		ids = model_erp.search([('id','>',last_id)],0,100)
+		# print ids ,"cek"
 	else:
 		print "Oops!  That was no valid number.  Try again..."
 
@@ -61,11 +73,20 @@ def GetModel(request,model,mode=None,fields=[]):
 	# 	print "yang elif"
 	# else:
 	# 	ids = model_erp.search([])
-	print ids,"<<<<<<<<"
-	read_model = model_erp.read(ids,fields)
+	# print ids,"<<<<<<<<"
+	if fields ==[]:
+		read_model = model_erp.read(ids)
+	else:
+		read_model = model_erp.read(ids,fields)
 	return Response ({"sukses":True,"Result":read_model})
+# @api_view(['GET','POST'])
+# def GetJson(request):
+# 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+# 	jsonrpc = openerplib.json_rpc('http://10.36.15.51:8069/coba/test','test',[])
+# 	return Response ({"sukses":True,"data":jsonrpc})
 
-
+# 3371
+# 3298
 class CustomGet(APIView):
 
 	# @api_view(['GET'])
@@ -161,3 +182,9 @@ class ServiceModel(APIView):
 
 	# 	ids = model_erp.search(res_param)
 	# 	print ids ,"iniii ids"
+
+
+
+# @api_view(['GET','POST'])
+# def json(request,model,mode=None,fields=[]):
+
