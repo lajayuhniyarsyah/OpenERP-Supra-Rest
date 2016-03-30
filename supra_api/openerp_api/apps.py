@@ -4,7 +4,7 @@ from django.apps import AppConfig
 
 
 class CustomConfig(AppConfig):
-    name = 'custom'
+    name = 'openerp_api'
     # openerplib = {
     # 	'username':'',
     # 	'password':'',

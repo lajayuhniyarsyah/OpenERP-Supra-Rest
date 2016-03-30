@@ -39,8 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'openerp',
-    'custom'
+    'openerp_api'
+
     # 'quickstart.models'
 ]
 
@@ -62,7 +62,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-ROOT_URLCONF = 'Django_api.urls'
+ROOT_URLCONF = 'supra_api.urls'
 
 TEMPLATES = [
     {
@@ -80,7 +80,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'Django_api.wsgi.application'
+WSGI_APPLICATION = 'supra_api.wsgi.application'
 
 
 # Database

@@ -17,8 +17,6 @@ from django.conf.urls import url,include
 from django.contrib import admin
 
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
-    url(r'^quickstart/',include('quickstart.urls')),
-    url(r'^openerp/',include('openerp.urls')),
-    url(r'^', include('custom.urls')),
+	url(r'^admin/', admin.site.urls),
+    url(r'^', include('openerp_api.urls')),
 ]
