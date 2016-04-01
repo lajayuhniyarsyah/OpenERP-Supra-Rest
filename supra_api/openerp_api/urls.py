@@ -4,9 +4,10 @@ from openerp_api import views
  
 urlpatterns = patterns('',
   url(r'^openerp-login/$', views.CustomGet.as_view()),
+  
+   url(r'^openerp/getjason/(?P<metode>(AllData|GetUpdate))/$',views.GetJson),
   # url(r'^openerp/(?P<model>[a-zA-Z,.]+)/$', views.ServiceModel.as_view()),
    url(r'^openerp/(?P<model>[a-zA-Z,.]+)/$',views.GetModel),
-    # url(r'^openerp/getjason/$',views.asdsd),
    # url(r'^json/$',views.json),
    url(r'^openerp/(?P<model>[a-zA-Z,.]+)/(?P<mode>(search|ids|getupdate|jsonrpc))/$',views.GetModel),
 )

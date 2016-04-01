@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 # from statsd.defaults.django import statsd
+from openerp_api import db_setting
 import openerplib
 import base64
 
@@ -11,89 +12,137 @@ import base64
 
 @api_view(['GET','POST'])
 def GetModel(request,model,mode=None,fields=[]):
-	# print request.path,"=",'/openerp/'+model+'/ids/'
-	
-
-	hostname = "localhost"
-	dbname = "belajarerp"
+	hostname = db_setting.configrest().host()
+	dbname = db_setting.configrest().database_name()
 	login = request.data["usn"]
 	usrpwd = request.data["pw"]
 	fields = request.data["fields"]
-
-
-	# param = [3401] #list id model
-
-
 	# login_d = 'ricky'
 	# usrpwd_d = 'ricky'
-
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
-	
-	
-
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
 	model_erp = connection.get_model(model)
-	
-	
 	if mode==None:
 		ids = model_erp.search([],0,100)
-		# ids = model_erp.search([('id','>',1235678)])
 	elif mode=="ids":
-		# print request.data["ids"],"<<<<<<<<<<<<<<<<<<<<<<"
 		ids =map(int, request.data["ids"])
-		# ids = [3401]
-	elif mode=='jsonrpc':
-		jsonrpc = openerplib.json_rpc('http://10.36.15.51:8069/sales_activity_plan','index',[])
-		return Response ({"sukses":True,"data":jsonrpc})
 	elif mode=="search":
 		searchfield = request.data['searchfield']
 		searchoperator = request.data['searchoperator']
 		searchcateg = request.data['searchcateg']
 		if searchcateg.isdigit():
 			searchcateg = int(request.data['searchcateg'])
-
 		print searchfield,searchoperator,searchcateg
 		ids = model_erp.search([(searchfield,searchoperator,searchcateg)])
-		# ids = request.data['nama']
-		# print "ini yang search bro"
 	elif mode == "getupdate":
 		last_id=  request.data['ids']
-		# print last_id,"bebas"
 		ids = model_erp.search([('id','>',last_id)],0,100)
-		# print ids ,"cek"
 	else:
 		print "Oops!  That was no valid number.  Try again..."
-
-	# if model_erp.search(param):
-	
-	# if request.path =='/openerp/'+model+'/ids/':
-	# 	ids =int(request.query_params['ids'])
-	# elif request.path =='/openerp/'+model+'/search/':
-	# 	print "yang elif"
-	# else:
-	# 	ids = model_erp.search([])
-	# print ids,"<<<<<<<<"
 	if fields ==[]:
 		read_model = model_erp.read(ids)
 	else:
 		read_model = model_erp.read(ids,fields)
 	return Response ({"sukses":True,"Result":read_model})
-# @api_view(['GET','POST'])
-# def GetJson(request):
-# 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
-# 	jsonrpc = openerplib.json_rpc('http://10.36.15.51:8069/coba/test','test',[])
-# 	return Response ({"sukses":True,"data":jsonrpc})
 
-# 3371
-# 3298
+@api_view(['GET','POST'])
+def GetJson(request,metode):
+	hostname = db_setting.configrest().host()
+	dbname = db_setting.configrest().database_name()
+	# login = request.data["usn"]
+	# usrpwd = request.data["pw"]
+	# login_d = base64.b64decode(login)
+	# usrpwd_d = base64.b64decode(usrpwd)
+	login_d = 'ricky'
+	usrpwd_d = 'ricky'
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	model_res_user = connection.get_model('res.users')
+	model_res_partner = connection.get_model('res.partner')
+	
+	
+	data=[]
+	print metode,"ini metode nya "
+	if metode =="AllData":
+		jsonrpc = openerplib.json_rpc('http://10.36.15.51:8069/sales_activity_plan/Getall','Getall',{'db':db_setting.configrest().database_name()})
+		for datajson in jsonrpc:
+			read_model_user = model_res_user.read(datajson[4],['name'])
+			read_res_partner=''
+			if datajson[10]:
+				read_res_partner = model_res_partner.read(datajson[10],['name'])
+				read_res_partner = read_res_partner['name']
+			if datajson[16]==1:
+				daylight="Before Lunch / Break"
+			elif datajson[16]==2:
+				daylight="After Lunch / Break"
+			else:
+				daylight=""
+			data.append({
+				'daylight':daylight,
+				'name':datajson[9],
+				'the_date':datajson[7],
+				'location':datajson[11],
+				'user':read_model_user['name'],
+				'partner':read_res_partner,
+				'id':datajson[18],
+				'activity_id':datajson[0],
+				'user_id':datajson[4],
+				'dow':datajson[17],
+				'daylight_num':datajson[16]
+				})
+	elif metode=="GetUpdate":
+		# print request.data["idview"],">>>>>>>>>>>>>>"
+		jsonrpc = openerplib.json_rpc(
+			'http://10.36.15.51:8069/sales_activity_plan/GetID',
+			'GetID',{'db':db_setting.configrest().database_name(),
+					'activity_id':request.data["activity_id"],
+					'user_id':request.data["user_id"],
+					'dow':request.data["dow"],
+					'daylight':request.data["day_ligth"],
+					'idview':request.data["idview"]
+					}
+			)
+		print jsonrpc
+		if jsonrpc!=0:
+			print "masiiiiiiiiiuuuuuuuuuuuuuukkkkkkkk"
+			for datajson in jsonrpc:
+				read_model_user = model_res_user.read(datajson[4],['name'])
+				read_res_partner=''
+				if datajson[10]:
+					read_res_partner = model_res_partner.read(datajson[10],['name'])
+					read_res_partner = read_res_partner['name']
+				if datajson[16]==1:
+					daylight="Before Lunch / Break"
+				elif datajson[16]==2:
+					daylight="After Lunch / Break"
+				else:
+					daylight=""
+				data.append({
+					'daylight':daylight,
+					'name':datajson[9],
+					'the_date':datajson[7],
+					'location':datajson[11],
+					'user':read_model_user['name'],
+					'partner':read_res_partner,
+					'id':datajson[18],
+					'activity_id':datajson[0],
+					'user_id':datajson[4],
+					'dow':datajson[17],
+					'daylight_num':datajson[16],
+
+					})
+	else:
+		print "ERROOOORRRR"
+
+	return Response ({"sukses":True,"data":data})
+
 class CustomGet(APIView):
 
 	# @api_view(['GET'])
 	def post(self, request, format=None):
 
-		hostname = "localhost"
-		dbname = "belajarerp"
+		hostname = db_setting.configrest().host()
+		dbname = db_setting.configrest().database_name()
 		login = request.data["usn"]
 		login_d = base64.b64decode(login)
 
@@ -125,13 +174,13 @@ class CustomGet(APIView):
 
 	
 
-class ServiceModel(APIView):
+# class ServiceModel(APIView):
 
 
 
-	def get(self,request,format=None,model="model"):
+# 	def get(self,request,format=None,model="model"):
 
-		return Response({"success": True,"model":model})
+# 		return Response({"success": True,"model":model})
 
 
 
