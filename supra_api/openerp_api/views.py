@@ -16,78 +16,10 @@ import pprint
 def GetModel(request,model,mode=None,fields=[]):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
-	print SalesActivityPlan,"iniiiiiiiiiiiiiiiiiiii",SalesActivityPlan.objects.all()
-
-
-
 	
-
-	# exp_condition = {
-
-	# 	"location": "Head Office", #location = "Head Office"
-
-	# 	# kalau array lookup = __in
-	# 	"the_date":["2015-12-08","2015-12-09"], 
- #        "user_id":[36,53,61],
- #        "location":['jakarta','bekasi'], #WHERE location in ('jakarta','bekasi')
-
-
- #        "location": {
-        	
- #        	"icontains":"Head Office", #location
- #        	"in":["head","office"],
- #        	"startswith":"Head", #location__startswith="Head" ==> location like 'Head%'
- #        	"istartswith":"Head", #location__istartswith="Head" ==> location ilike 'Head%'
- #        	"endswith":"Office", #location__startswith="Head" ==> location like '%Office'
- #        	"iendswith":"Office", #location__istartswith="Head" ==> location ilike '%Office'
- #        },
-
-
- #        "the_date":{
- #        	"range":["2015-12-01","2015-12-31"], #where the_date beetween '2015-12-01' AND '2015-12-31'
- #        	"gt":"2015-12-01",
- #        	"gte":"2015-12-01", 
- #        	"lt":"2015-12-01", #less than
- #        	"lte":"2015-12-01",
-        	
- #        }
-	# }
-	# input
-	condition = {
-		"user_id":[61,53],
-		"the_date":'2015-12-01'
-	}
-
-
-	# proses
-	kwarg={}
-	for k, v in condition.items():
-		if type(v)==list:
-			kwarg[k+"__in"]=v
-		else:
-			kwarg[k]=v
-
-
-
-	print kwarg,"testttttttttttttttttttttt"
-	# output
-	exp_kwarg = {
-		"user_id__in":[61,53],
-		'the_date':'2015-12-01'
-	}
-
-	example_call = SalesActivityPlan.objects.filter(**kwarg)
-
-	for exc in example_call:
-		print exc.the_date,"=",exc.user_id
-	# pprint.pprint(a[0])
-	# pprint.pprint(a[0])
-	# print "===========",b[0].the_date,"======",len(c),"============",len(d)
-	# print e[0].the_date,'-->',e[0].user_id
-	# print (a[0]).activity_id,"iniiiiiiiiiiiiiiiiii"
 	# login = request.data["usn"]
 	# usrpwd = request.data["pw"]
-	# fields = request.data["fields"]
+	fields = request.data["fields"]
 	login_d = 'ricky'
 	usrpwd_d = 'ricky'
 	# login_d = base64.b64decode(login)
@@ -439,3 +371,134 @@ def create(request,model):
 	model_erp.create(request.data["vals"])
 
 	return Response ({"sukses":True})
+@api_view(['GET','POST'])
+def salestimeline(request,metode):
+	# print SalesActivityPlan,"iniiiiiiiiiiiiiiiiiiii",SalesActivityPlan.objects.all()
+
+	hostname = db_setting.configrest().host()
+	dbname = db_setting.configrest().database_name()
+	
+	# login = request.data["usn"]
+	# usrpwd = request.data["pw"]
+
+	login_d = 'ricky'
+	usrpwd_d = 'ricky'
+	# login_d = base64.b64decode(login)
+	# usrpwd_d = base64.b64decode(usrpwd)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	# model_erp = connection.get_model(model)
+	model_res_user = connection.get_model('res.users')
+	model_res_partner = connection.get_model('res.partner')
+
+	
+
+	# exp_condition = {
+
+	# 	"location": "Head Office", #location = "Head Office"
+
+	# 	# kalau array lookup = __in
+	# 	"the_date":["2015-12-08","2015-12-09"], 
+ #        "user_id":[36,53,61],
+ #        "location":['jakarta','bekasi'], #WHERE location in ('jakarta','bekasi')
+
+
+ #        "location": {
+        	
+ #        	"icontains":"Head Office", #location
+ #        	"in":["head","office"],
+ #        	"startswith":"Head", #location__startswith="Head" ==> location like 'Head%'
+ #        	"istartswith":"Head", #location__istartswith="Head" ==> location ilike 'Head%'
+ #        	"endswith":"Office", #location__startswith="Head" ==> location like '%Office'
+ #        	"iendswith":"Office", #location__istartswith="Head" ==> location ilike '%Office'
+ #        },
+
+
+ #        "the_date":{
+ #        	"range":["2015-12-01","2015-12-31"], #where the_date beetween '2015-12-01' AND '2015-12-31'
+ #        	"gt":"2015-12-01",
+ #        	"gte":"2015-12-01", 
+ #        	"lt":"2015-12-01", #less than
+ #        	"lte":"2015-12-01",
+        	
+ #        }
+	# }
+	# input
+	# condition = {
+	# 	# "user_id":[61,53],
+	# 	"the_date":['2015-12-01','2015-11-12']
+	# }
+
+
+	# proses
+
+	kwarg={}
+	for k, v in (request.data["params"])['condition'].items():
+		if type(v)==list:
+			kwarg[k+"__in"]=v
+		else:
+			kwarg[k]=v
+
+
+
+	# print kwarg,"testttttttttttttttttttttt"
+	# # output
+	# exp_kwarg = {
+	# 	"user_id__in":[61,53],
+	# 	'the_date':'2015-12-01'
+	# }
+	if metode == "AllData":
+		data_sales_act = SalesActivityPlan.objects.filter(**kwarg)[:]
+	elif metode == "GetUpdate":
+		data_sales_act = SalesActivityPlan.objects.filter(**kwarg)[(request.data["params"])['offset']:(request.data["params"])['limit']]# offset : limit 
+
+	
+	result =[]
+	for data in data_sales_act:
+		
+		read_model_user = model_res_user.read(data.user_id,['name',"initial"])
+
+		read_res_partner=""
+		if data.partner_id:
+			read_res_partner = model_res_partner.read(data.partner_id,['name'])
+			read_res_partner = read_res_partner['name']
+		if data.daylight==1:
+			daylight="Before Lunch / Break"
+		elif data.daylight==2:
+			daylight="After Lunch / Break"
+		else:
+			daylight=""
+		# pprint.pprint(datajson[14])
+		# actual_result=datajson[14].replace("b","c")
+		if data.actual_partner_id !=' ':
+			actual_result_partner=read_res_partner
+			actual_result_location = data.actual_location
+			actual_result =data.actual_result
+		else:
+			actual_result_partner=""
+			actual_result=""
+			actual_result_location = ""
+		result.append({
+			'daylight':daylight,
+			'name':data.name,
+			'the_date':data.the_date,
+			'location':data.location,
+			'user':read_model_user['name'],
+			'initial':read_model_user['initial'],
+			'partner':read_res_partner,
+			'id':data.id,
+			'activity_id':data.activity_id,
+			'user_id':data.user_id,
+			'dow':data.dow,
+			'daylight_num':data.daylight,
+			'actual_result_partner':actual_result_partner,
+			'actual_result_location':actual_result_location,
+			'actual_result':actual_result,
+			'canceled_plan':data.canceled_plan,
+			'not_planned_actual':data.not_planned_actual,
+			})
+	# pprint.pprint(a[0])
+	# pprint.pprint(a[0])
+	# print "===========",b[0].the_date,"======",len(c),"============",len(d)
+	# print e[0].the_date,'-->',e[0].user_id
+	# print (a[0]).activity_id,"iniiiiiiiiiiiiiiiiii"
+	return Response ({"sukses":True,"data":result})
