@@ -17,14 +17,15 @@ def GetModel(request,model,mode=None,fields=[]):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
 	
-	# login = request.data["usn"]
-	# usrpwd = request.data["pw"]
+	login = request.data["usn"]
+	usrpwd = request.data["pw"]
 	fields = request.data["fields"]
-	login_d = 'ricky'
-	usrpwd_d = 'ricky'
-	# login_d = base64.b64decode(login)
-	# usrpwd_d = base64.b64decode(usrpwd)
+	# login_d = 'ricky'
+	# usrpwd_d = 'ricky'
+	login_d = base64.b64decode(login)
+	usrpwd_d = base64.b64decode(usrpwd)
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	# print request.session.session_key,"ini koneksi"
 	model_erp = connection.get_model(model)
 	if mode==None:
 		ids = model_erp.search([],0,100)
@@ -54,7 +55,7 @@ def GetModel(request,model,mode=None,fields=[]):
 		# 		['active','=',True]
 		# 	]
 		# }
-		print request.data,"+================================"
+		# print request.data,"+================================"
 		ids = model_erp.search(request.data['domain'])
 
 	elif mode == "getupdate":
@@ -72,12 +73,12 @@ def GetModel(request,model,mode=None,fields=[]):
 def GetJson(request,metode):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
-	# login = request.data["usn"]
-	# usrpwd = request.data["pw"]
-	# login_d = base64.b64decode(login)
-	# usrpwd_d = base64.b64decode(usrpwd)
-	login_d = 'ricky'
-	usrpwd_d = 'ricky'
+	login = request.data["usn"]
+	usrpwd = request.data["pw"]
+	login_d = base64.b64decode(login)
+	usrpwd_d = base64.b64decode(usrpwd)
+	# login_d = 'ricky'
+	# usrpwd_d = 'ricky'
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
@@ -356,19 +357,277 @@ class CustomGet(APIView):
 
 # @api_view(['GET','POST'])
 # def json(request,model,mode=None,fields=[]):
+
+
 @api_view(['GET','POST'])
-def create(request,model):
+def createsalesplan(request):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
 	login = request.data["usn"]
 	usrpwd = request.data["pw"]
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
+	# print request.data["vals"],"aaaaaaaaaaaa"
 	# login_d = 'admin'
 	# usrpwd_d = 'supra'
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	model_sales_act = connection.get_model('sales.activity')
+
+	# idbaru = model_sales_act.create({
+	# 				'user_id':214,
+	# 				'begin':'2016-04-18',
+	# 				'end':'2016-04-24',
+	# 				'beforeplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah',}),],
+					
+	# 				'afterplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'beforeplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'afterplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'afterplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				'beforeplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				'beforeplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				})
+
+	
+
+	idbaru = model_sales_act.create(request.data['vals'])
+	sales_activity_plan = model_sales_act.read(idbaru)
+	
+	modelbps = connection.get_model('before.plan.senin')
+	modelbas = connection.get_model('before.actual.senin')
+	for bps in sales_activity_plan['beforeplansenin']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+
+	modelbps = connection.get_model('before.plan.selasa')
+	modelbas = connection.get_model('before.actual.selasa')
+	for bps in sales_activity_plan['beforeplanselasa']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	
+	modelbps = connection.get_model('before.plan.rabu')
+	modelbas = connection.get_model('before.actual.rabu')
+	for bps in sales_activity_plan['beforeplanrabu']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('before.plan.kamis')
+	modelbas = connection.get_model('before.actual.kamis')
+	for bps in sales_activity_plan['beforeplankamis']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('before.plan.jumat')
+	modelbas = connection.get_model('before.actual.jumat')
+	for bps in sales_activity_plan['beforeplanjumat']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('before.plan.sabtu')
+	modelbas = connection.get_model('before.actual.sabtu')
+	for bps in sales_activity_plan['beforeplansabtu']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('before.plan.ahad')
+	modelbas = connection.get_model('before.actual.ahad')
+	for bps in sales_activity_plan['beforeplansabtu']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('after.plan.senin')
+	modelbas = connection.get_model('after.actual.senin')
+	for bps in sales_activity_plan['afterplansenin']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+
+	modelbps = connection.get_model('after.plan.selasa')
+	modelbas = connection.get_model('after.actual.selasa')
+	for bps in sales_activity_plan['afterplanselasa']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	
+	modelbps = connection.get_model('after.plan.rabu')
+	modelbas = connection.get_model('after.actual.rabu')
+	for bps in sales_activity_plan['afterplanrabu']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('after.plan.kamis')
+	modelbas = connection.get_model('after.actual.kamis')
+	for bps in sales_activity_plan['afterplankamis']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('after.plan.jumat')
+	modelbas = connection.get_model('after.actual.jumat')
+	for bps in sales_activity_plan['afterplanjumat']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('after.plan.sabtu')
+	modelbas = connection.get_model('after.actual.sabtu')
+	for bps in sales_activity_plan['afterplansabtu']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+	modelbps = connection.get_model('after.plan.ahad')
+	modelbas = connection.get_model('after.actual.ahad')
+	for bps in sales_activity_plan['afterplanahad']:
+		val_bps= modelbps.read(bps)
+		
+		modelbas.create({
+							'partner_id':val_bps['partner_id'][0],
+							'location':val_bps['location'],
+							'name':val_bps['name'],
+							'plan_id':val_bps['id'],
+							'activity_id':val_bps['activity_id'][0]
+							}
+							)
+
+	return Response ({"sukses":True})
+@api_view(['GET','POST'])
+def create(request,model):
+	hostname = db_setting.configrest().host()
+	dbname = db_setting.configrest().database_name()
+	# login = request.data["usn"]
+	# usrpwd = request.data["pw"]
+	# login_d = base64.b64decode(login)
+	# usrpwd_d = base64.b64decode(usrpwd)
+	# print request.data["vals"],"aaaaaaaaaaaa"
+	login_d = 'admin'
+	usrpwd_d = 'supra'
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
 	model_erp = connection.get_model(model)
-	model_erp.create(request.data["vals"])
+
+	# model_erp.create({
+	# 				'user_id':214,
+	# 				'begin':'2016-04-18',
+	# 				'end':'2016-04-24',
+	# 				'beforeplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah',}),],
+	# 				'beforeactualsenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah',}),],
+	# 				'afterplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'beforeplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'afterplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
+	# 				'afterplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'beforeplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				'beforeplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				'beforeplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
+	# 				'afterplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
+	# 				})
+	# print request.data['vals'],"iniii sannnn"
+	idbaru = model_erp.create(request.data['vals'])
+
+	# read idbaru	
+	# read()
+	# ?looping semua plan terus insert ke object actual
+
 
 	return Response ({"sukses":True})
 @api_view(['GET','POST'])
@@ -378,15 +637,15 @@ def salestimeline(request,metode):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
 	
-	# login = request.data["usn"]
-	# usrpwd = request.data["pw"]
+	login = request.data["usn"]
+	usrpwd = request.data["pw"]
 
-	login_d = 'ricky'
-	usrpwd_d = 'ricky'
-	# login_d = base64.b64decode(login)
-	# usrpwd_d = base64.b64decode(usrpwd)
+	# login_d = 'ricky'
+	# usrpwd_d = 'ricky'
+	login_d = base64.b64decode(login)
+	usrpwd_d = base64.b64decode(usrpwd)
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
-	# model_erp = connection.get_model(model)
+	
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
 

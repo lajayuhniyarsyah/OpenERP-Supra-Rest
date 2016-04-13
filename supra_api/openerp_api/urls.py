@@ -4,6 +4,7 @@ from openerp_api import views
  
 urlpatterns = patterns('',
   url(r'^openerp-login/$', views.CustomGet.as_view()),
+   url(r'^openerp/createsalesplan/$',views.createsalesplan),
   url(r'^openerp/create/(?P<model>[a-zA-Z,.]+)/$',views.create),
   url(r'^openerp/salestimeline/(?P<metode>(AllData|GetUpdate))/$',views.salestimeline),
   url(r'^openerp/getjason/(?P<metode>(AllData|GetUpdate|search))/$',views.GetJson),
