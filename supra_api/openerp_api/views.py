@@ -24,7 +24,7 @@ def GetModel(request,model,mode=None,fields=[]):
 	# usrpwd_d = 'ricky'
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
 	# print request.session.session_key,"ini koneksi"
 	model_erp = connection.get_model(model)
 	if mode==None:
@@ -79,7 +79,7 @@ def GetJson(request,metode):
 	usrpwd_d = base64.b64decode(usrpwd)
 	# login_d = 'ricky'
 	# usrpwd_d = 'ricky'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
 	
@@ -271,7 +271,7 @@ class CustomGet(APIView):
 		usrpwd_d = base64.b64decode(usrpwd)
 
 
-		connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+		connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
 	
 		user_model = connection.get_model("res.users")
 		# sale = connection.get_model("sales.activity")
@@ -370,7 +370,7 @@ def createsalesplan(request):
 	# print request.data["vals"],"aaaaaaaaaaaa"
 	# login_d = 'admin'
 	# usrpwd_d = 'supra'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
 	model_sales_act = connection.get_model('sales.activity')
 
 	# idbaru = model_sales_act.create({
@@ -407,7 +407,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -421,7 +421,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -435,7 +435,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -448,7 +448,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -461,7 +461,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -474,7 +474,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -487,7 +487,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -500,7 +500,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -514,7 +514,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -528,7 +528,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -541,7 +541,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -554,7 +554,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -567,7 +567,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -580,7 +580,7 @@ def createsalesplan(request):
 		modelbas.create({
 							'partner_id':val_bps['partner_id'][0],
 							'location':val_bps['location'],
-							'name':val_bps['name'],
+							# 'name':val_bps['name'],
 							'plan_id':val_bps['id'],
 							'activity_id':val_bps['activity_id'][0]
 							}
@@ -598,7 +598,7 @@ def create(request,model):
 	# print request.data["vals"],"aaaaaaaaaaaa"
 	login_d = 'admin'
 	usrpwd_d = 'supra'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=10001)
 	model_erp = connection.get_model(model)
 
 	# model_erp.create({
@@ -644,7 +644,7 @@ def salestimeline(request,metode):
 	# usrpwd_d = 'ricky'
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=10001)
 	
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
@@ -689,7 +689,7 @@ def salestimeline(request,metode):
 
 
 	# proses
-
+	print SalesActivityPlan.objects.all(),"iniiiiiiiiiiiiiiii"
 	kwarg={}
 	for k, v in (request.data["params"])['condition'].items():
 		if type(v)==list:
@@ -706,7 +706,9 @@ def salestimeline(request,metode):
 	# 	'the_date':'2015-12-01'
 	# }
 	if metode == "AllData":
-		data_sales_act = SalesActivityPlan.objects.filter(**kwarg)[:]
+		print "aaaaa"
+		data_sales_act = SalesActivityPlan.objects.filter(**kwarg).order_by('-the_date')[:]
+		print "test"
 	elif metode == "GetUpdate":
 		data_sales_act = SalesActivityPlan.objects.filter(**kwarg)[(request.data["params"])['offset']:(request.data["params"])['limit']]# offset : limit 
 
