@@ -751,5 +751,10 @@ def update(request,model):
 	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=8069)
 	model_erp = connection.get_model(model)
 
-	idbaru = model_erp.write(3488,{'beforeplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'ini ganti coba lagi',}),],})
+	idbaru = model_erp.write(3488,{
+									'beforeactualsenin':[(2,id,{'name':'ini ganti coba lagi',}),],
+									'beforeactualselasa':[(2,id,{'partner_id':1023,'location':'sunter','name':'ini ganti coba lagi',}),],
+									})
+
+	idbaru = model_erp.write(request.data["ids"],request.data["vals"])
 	return Response ({"sukses":True})
