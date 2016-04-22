@@ -24,7 +24,7 @@ def GetModel(request,model,mode=None,fields=[]):
 	# usrpwd_d = 'ricky'
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=8069)
 	# print request.session.session_key,"ini koneksi"
 	model_erp = connection.get_model(model)
 	if mode==None:
@@ -79,7 +79,7 @@ def GetJson(request,metode):
 	usrpwd_d = base64.b64decode(usrpwd)
 	# login_d = 'ricky'
 	# usrpwd_d = 'ricky'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=8069)
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
 	
@@ -271,7 +271,7 @@ class CustomGet(APIView):
 		usrpwd_d = base64.b64decode(usrpwd)
 
 
-		connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
+		connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=8069)
 	
 		user_model = connection.get_model("res.users")
 		# sale = connection.get_model("sales.activity")
@@ -370,7 +370,7 @@ def createsalesplan(request):
 	# print request.data["vals"],"aaaaaaaaaaaa"
 	# login_d = 'admin'
 	# usrpwd_d = 'supra'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=10001)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d ,port=8069)
 	model_sales_act = connection.get_model('sales.activity')
 
 	# idbaru = model_sales_act.create({
@@ -587,49 +587,20 @@ def createsalesplan(request):
 							)
 
 	return Response ({"sukses":True})
+
 @api_view(['GET','POST'])
 def create(request,model):
 	hostname = db_setting.configrest().host()
 	dbname = db_setting.configrest().database_name()
-	# login = request.data["usn"]
-	# usrpwd = request.data["pw"]
-	# login_d = base64.b64decode(login)
-	# usrpwd_d = base64.b64decode(usrpwd)
-	# print request.data["vals"],"aaaaaaaaaaaa"
-	login_d = 'admin'
-	usrpwd_d = 'supra'
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=10001)
+	login = request.data["usn"]
+	usrpwd = request.data["pw"]
+	login_d = base64.b64decode(login)
+	usrpwd_d = base64.b64decode(usrpwd)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=8069)
 	model_erp = connection.get_model(model)
-
-	# model_erp.create({
-	# 				'user_id':214,
-	# 				'begin':'2016-04-18',
-	# 				'end':'2016-04-24',
-	# 				'beforeplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah',}),],
-	# 				'beforeactualsenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah',}),],
-	# 				'afterplansenin':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
-	# 				'beforeplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
-	# 				'afterplanselasa':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'beforeplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ],
-	# 				'afterplanrabu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'beforeplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'afterplankamis':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'beforeplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'afterplanjumat':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
-	# 				'beforeplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'afterplansabtu':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
-	# 				'beforeplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ], 
-	# 				'afterplanahad':[(0,0,{'partner_id':1023,'location':'sunter','name':'maen dlu ah'}), ] ,
-	# 				})
-	# print request.data['vals'],"iniii sannnn"
 	idbaru = model_erp.create(request.data['vals'])
-
-	# read idbaru	
-	# read()
-	# ?looping semua plan terus insert ke object actual
-
-
 	return Response ({"sukses":True})
+
 @api_view(['GET','POST'])
 def salestimeline(request,metode):
 	# print SalesActivityPlan,"iniiiiiiiiiiiiiiiiiiii",SalesActivityPlan.objects.all()
@@ -644,7 +615,7 @@ def salestimeline(request,metode):
 	# usrpwd_d = 'ricky'
 	login_d = base64.b64decode(login)
 	usrpwd_d = base64.b64decode(usrpwd)
-	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=10001)
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=8069)
 	
 	model_res_user = connection.get_model('res.users')
 	model_res_partner = connection.get_model('res.partner')
@@ -763,3 +734,27 @@ def salestimeline(request,metode):
 	# print e[0].the_date,'-->',e[0].user_id
 	# print (a[0]).activity_id,"iniiiiiiiiiiiiiiiiii"
 	return Response ({"sukses":True,"data":result})
+
+	
+@api_view(['GET','POST'])
+def update(request,model):
+	hostname = db_setting.configrest().host()
+	dbname = db_setting.configrest().database_name()
+	# login = request.data["usn"]
+	# usrpwd = request.data["pw"]
+	# login_d = base64.b64decode(login)
+	# usrpwd_d = base64.b64decode(usrpwd)
+
+	login_d = 'admin'
+	usrpwd_d = 'supra'
+
+	connection = openerplib.get_connection(hostname=hostname, database=dbname,login=login_d, password=usrpwd_d,port=8069)
+	model_erp = connection.get_model(model)
+
+	idbaru = model_erp.write(3488,{
+									'beforeactualsenin':[(2,id,{'name':'ini ganti coba lagi',}),],
+									'beforeactualselasa':[(2,id,{'partner_id':1023,'location':'sunter','name':'ini ganti coba lagi',}),],
+									})
+
+	idbaru = model_erp.write(request.data["ids"],request.data["vals"])
+	return Response ({"sukses":True})
